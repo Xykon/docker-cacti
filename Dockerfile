@@ -1,6 +1,6 @@
 FROM rockylinux:9.0
 
-LABEL org.opencontainers.image.authors="Sean Cline <smcline06@gmail.com>"
+LABEL org.opencontainers.image.authors="Shawn Chiang <life.liberty.3happiness@gmail.com>"
 
 EXPOSE 80 443
 
@@ -34,9 +34,10 @@ COPY start.sh /start.sh
 ## --- SUPPORTING FILES ---
 #COPY cacti /cacti_install
 
+RUN yum update -y && yum install -y curl
 # --- GET LATEST VERSION
-ADD http://files.cacti.net/spine/cacti-spine-latest.tar.gz /cacti_install/cacti-spine-latest.tar.gz 
-ADD https://files.cacti.net/cacti/linux/cacti-latest.tar.gz /cacti_install/cacti-latest.tar.gz
+RUN curl --fail --create-dirs -o /cacti_install/cacti-spine-latest.tar.gz https://files.cacti.net/spine/cacti-spine-latest.tar.gz 
+RUN curl --fail --create-dirs -o /cacti_install/cacti-latest.tar.gz https://files.cacti.net/cacti/linux/cacti-latest.tar.gz
 
 ## --- SERVICE CONFIGS ---
 COPY configs /template_configs
@@ -62,7 +63,6 @@ RUN \
     mkdir /backups && \
     mkdir /cacti && \
     mkdir /spine && \
-    yum update -y && \
     yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm && \
     yum install -y dnf-plugins-core && \
     yum config-manager --set-enabled crb && \
@@ -75,7 +75,7 @@ RUN \
     rrdtool net-snmp net-snmp-utils cronie mariadb autoconf \
     bison openssl openldap mod_ssl net-snmp-libs automake \
     gcc gzip libtool make net-snmp-devel dos2unix m4 which \
-    openssl-devel mariadb-devel sendmail curl wget help2man perl-libwww-perl && \
+    openssl-devel mariadb-devel sendmail wget help2man perl-libwww-perl && \
     yum clean all && \
     rm -rf /var/cache/yum/* && \
     chmod 0644 /etc/crontab && \
